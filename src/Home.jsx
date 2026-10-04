@@ -525,12 +525,14 @@ function Home() {
             Contact Us
           </Link>
 
-          <Link
-            to="/contact"
-            className="outline-btn"
-          >
-            WhatsApp Us
-          </Link>
+          <a
+  href="https://wa.me/919342438683"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="outline-btn"
+>
+  WhatsApp Us
+</a>
 
         </div>
 
