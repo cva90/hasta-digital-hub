@@ -78,7 +78,7 @@ function Contact() {
           </p>
 
           <a
-            href="tel:+919342428683"
+            href="tel:+919342438683"
             className="page-button"
           >
             Call Now →
@@ -97,7 +97,7 @@ function Contact() {
           </p>
 
           <a
-            href="https://wa.me/919342428683"
+            href="https://wa.me/+919342438683"
             target="_blank"
             rel="noreferrer"
             className="page-button"

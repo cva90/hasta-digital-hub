@@ -526,7 +526,7 @@ function Home() {
           </Link>
 
           <a
-  href="https://wa.me/919342438683"
+  href="https://wa.me/9342438683"
   target="_blank"
   rel="noopener noreferrer"
   className="outline-btn"
