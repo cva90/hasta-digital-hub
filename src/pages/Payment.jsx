@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PageLayout from "./PageLayout";
 
@@ -56,7 +55,7 @@ function Payment() {
 
       // Create Razorpay order
       const response = await fetch(
-  "https://hasta-digital-hub.onrender.com/api/payment/create-order"
+        "https://hasta-digital-hub.onrender.com/api/payment/create-order",
         {
           method: "POST",
           headers: {
@@ -104,52 +103,52 @@ function Payment() {
           color: "#ff0000",
         },
 
-        
-handler: async function (response) {
-  try {
-    const verifyResponse = await fetch(
-     "https://hasta-digital-hub.onrender.com/api/payment/verify"
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+        // Verify payment on backend
+        handler: async function (response) {
+          try {
+            const verifyResponse = await fetch(
+              "https://hasta-digital-hub.onrender.com/api/payment/verify",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+
+                  name: formData.name,
+                  mobile: formData.mobile,
+                  email: formData.email,
+                  service: formData.service,
+                  amount: formData.amount,
+                }),
+              }
+            );
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyResponse.ok && verifyData.success) {
+              alert(
+                "Payment verified successfully! ✅\n\nPayment ID: " +
+                  response.razorpay_payment_id
+              );
+            } else {
+              alert(
+                "Payment verification failed ❌\n\n" +
+                  (verifyData.message ||
+                    "Please contact Hasta Digital Hub.")
+              );
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+
+            alert(
+              "Payment was completed, but verification could not be completed."
+            );
+          }
         },
-        body: JSON.stringify({
-  razorpay_order_id: response.razorpay_order_id,
-  razorpay_payment_id: response.razorpay_payment_id,
-  razorpay_signature: response.razorpay_signature,
-
-  name: formData.name,
-  mobile: formData.mobile,
-  email: formData.email,
-  service: formData.service,
-  amount: formData.amount,
-}),
-      }
-    );
-
-    const verifyData = await verifyResponse.json();
-
-    if (verifyResponse.ok && verifyData.success) {
-      alert(
-        "Payment verified successfully! ✅\n\nPayment ID: " +
-          response.razorpay_payment_id
-      );
-    } else {
-      alert(
-        "Payment verification failed ❌\n\n" +
-          (verifyData.message || "Please contact Hasta Digital Hub.")
-      );
-    }
-  } catch (error) {
-    console.error("Payment verification error:", error);
-
-    alert(
-      "Payment was completed, but verification could not be completed."
-    );
-  }
-},
-
 
         modal: {
           ondismiss: function () {
