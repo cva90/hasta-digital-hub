@@ -541,29 +541,49 @@ function Home() {
 
       {/* ================= FOOTER ================= */}
 
-      <footer>
+<footer>
 
-        <Link
-          to="/"
-          className="footer-logo"
-        >
+  <Link
+    to="/"
+    className="footer-logo"
+  >
 
-          <div className="logo-icon">
-            H
-          </div>
+    <div className="logo-icon">
+      H
+    </div>
 
-          <div>
-            <strong>Hasta</strong>
-            <small>Digital Hub</small>
-          </div>
+    <div>
+      <strong>Hasta</strong>
+      <small>Digital Hub</small>
+    </div>
 
-        </Link>
+  </Link>
 
-        <p>
-          © 2026 Hasta Digital Hub. All Rights Reserved.
-        </p>
 
-      </footer>
+  <p>
+    © 2026 Hasta Digital Hub. All Rights Reserved.
+  </p>
+
+
+  {/* LEGAL LINKS */}
+
+  <div className="footer-links">
+
+    <Link to="/privacy-policy">
+      Privacy Policy
+    </Link>
+
+    <Link to="/terms-and-conditions">
+      Terms & Conditions
+    </Link>
+
+    <Link to="/refund-policy">
+      Refund & Cancellation
+    </Link>
+
+  </div>
+
+</footer>
 
     </div>
   );

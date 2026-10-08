@@ -1,8 +1,8 @@
+
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
 function PageLayout({ title, subtitle, children }) {
-
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -146,6 +146,25 @@ function PageLayout({ title, subtitle, children }) {
         <p>
           © 2026 Hasta Digital Hub. All Rights Reserved.
         </p>
+
+
+        {/* LEGAL LINKS */}
+
+        <div className="footer-links">
+
+          <Link to="/privacy-policy">
+            Privacy Policy
+          </Link>
+
+          <Link to="/terms-and-conditions">
+            Terms & Conditions
+          </Link>
+
+          <Link to="/refund-policy">
+            Refund & Cancellation
+          </Link>
+
+        </div>
 
       </footer>
 

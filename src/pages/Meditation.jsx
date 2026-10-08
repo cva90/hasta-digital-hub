@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import PageLayout from "./PageLayout";
 
 function Meditation() {
+  const navigate = useNavigate();
   return (
     <PageLayout
       title="Meditation Classes"
@@ -38,21 +40,24 @@ function Meditation() {
         style={{ marginTop: "40px" }}
       >
 
-        {/* Guided Meditation */}
+       {/* Guided Meditation */}
 
-        <div className="page-card">
-          <div className="page-icon">🧘</div>
+<div
+  className="page-card"
+  onClick={() => navigate("/guided-meditation")}
+  style={{ cursor: "pointer" }}
+>
+  <div className="page-icon">🧘</div>
 
-          <h3>
-            Guided Meditation
-          </h3>
+  <h3>
+    Guided Meditation
+  </h3>
 
-          <p>
-            Easy-to-follow guided sessions suitable for beginners
-            and regular practitioners.
-          </p>
-        </div>
-
+  <p>
+    Easy-to-follow guided sessions suitable for beginners
+    and regular practitioners.
+  </p>
+</div>
 
         {/* Relaxation */}
 
