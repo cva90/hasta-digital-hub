@@ -56,7 +56,7 @@ function Payment() {
 
       // Create Razorpay order
       const response = await fetch(
-        https://hasta-digital-hub.onrender.com/api/payment/create-order
+  "https://hasta-digital-hub.onrender.com/api/payment/create-order"
         {
           method: "POST",
           headers: {
@@ -108,7 +108,7 @@ function Payment() {
 handler: async function (response) {
   try {
     const verifyResponse = await fetch(
-      https://hasta-digital-hub.onrender.com/api/payment/verify,
+     "https://hasta-digital-hub.onrender.com/api/payment/verify"
       {
         method: "POST",
         headers: {
