@@ -1,13 +1,26 @@
+
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageLayout from "./PageLayout";
 
 function Payment() {
+  const [searchParams] = useSearchParams();
+
+  const selectedService = searchParams.get("service");
+
+  const isMeditation = selectedService === "meditation";
+  const isWebsiteDevelopment = selectedService === "website-development";
+
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
     email: "",
-    service: "",
-    amount: "",
+    service: isMeditation
+      ? "Meditation Classes"
+      : isWebsiteDevelopment
+        ? "Website Development"
+        : "",
+    amount: isMeditation ? "299" : "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -29,7 +42,6 @@ function Payment() {
       }
 
       const script = document.createElement("script");
-
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
@@ -41,10 +53,21 @@ function Payment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isWebsiteDevelopment) {
+      alert(
+        "Thank you for your interest! Please contact Hasta Digital Hub to discuss your project and receive a quotation before payment."
+      );
+      return;
+    }
+
+    if (isMeditation && Number(formData.amount) !== 299) {
+      alert("Meditation session fee is fixed at ₹299.");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      // Load Razorpay Checkout
       const scriptLoaded = await loadRazorpayScript();
 
       if (!scriptLoaded) {
@@ -53,7 +76,6 @@ function Payment() {
         return;
       }
 
-      // Create Razorpay order
       const response = await fetch(
         "https://hasta-digital-hub.onrender.com/api/payment/create-order",
         {
@@ -79,18 +101,12 @@ function Payment() {
         return;
       }
 
-      // Razorpay Checkout
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-
         amount: data.order.amount,
-
         currency: data.order.currency,
-
         name: "Hasta Digital Hub",
-
         description: formData.service,
-
         order_id: data.order.id,
 
         prefill: {
@@ -103,8 +119,7 @@ function Payment() {
           color: "#ff0000",
         },
 
-        // Verify payment on backend
-        handler: async function (response) {
+        handler: async function (paymentResponse) {
           try {
             const verifyResponse = await fetch(
               "https://hasta-digital-hub.onrender.com/api/payment/verify",
@@ -114,10 +129,9 @@ function Payment() {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
                   name: formData.name,
                   mobile: formData.mobile,
                   email: formData.email,
@@ -132,7 +146,7 @@ function Payment() {
             if (verifyResponse.ok && verifyData.success) {
               alert(
                 "Payment verified successfully! ✅\n\nPayment ID: " +
-                  response.razorpay_payment_id
+                  paymentResponse.razorpay_payment_id
               );
             } else {
               alert(
@@ -145,7 +159,7 @@ function Payment() {
             console.error("Payment verification error:", error);
 
             alert(
-              "Payment was completed, but verification could not be completed."
+              "Payment was completed, but verification could not be completed. Please contact Hasta Digital Hub."
             );
           }
         },
@@ -159,14 +173,17 @@ function Payment() {
 
       const razorpay = new window.Razorpay(options);
 
-      razorpay.open();
+      razorpay.on("payment.failed", function (failureResponse) {
+        console.error("Razorpay payment failed:", failureResponse.error);
+        alert("Payment failed. Please try again.");
+        setLoading(false);
+      });
 
+      razorpay.open();
       setLoading(false);
     } catch (error) {
       console.error("Payment error:", error);
-
       alert("Something went wrong while starting the payment.");
-
       setLoading(false);
     }
   };
@@ -176,25 +193,25 @@ function Payment() {
       title="Online Payment"
       subtitle="Simple, secure and convenient payments for selected Hasta Digital Hub services."
     >
-      {/* ================= PAYMENT INTRO ================= */}
-
       <div className="page-card">
         <p className="section-tag">ONLINE PAYMENT</p>
 
-        <h2>Make a Secure Payment.</h2>
+        <h2>
+          {isMeditation
+            ? "Book Your Meditation Session."
+            : isWebsiteDevelopment
+              ? "Website Development Enquiry."
+              : "Make a Secure Payment."}
+        </h2>
 
         <p>
-          Use this payment form to pay for eligible Hasta Digital Hub
-          services and classes.
-        </p>
-
-        <p>
-          Please confirm your service details and payment amount before
-          proceeding.
+          {isMeditation
+            ? "Complete your details to book a meditation session for ₹299."
+            : isWebsiteDevelopment
+              ? "Share your details and contact us to discuss your website requirements and receive a quotation."
+              : "Please confirm your service details and payment amount before proceeding."}
         </p>
       </div>
-
-      {/* ================= PAYMENT FORM ================= */}
 
       <div
         className="page-card"
@@ -204,11 +221,8 @@ function Payment() {
         }}
       >
         <form onSubmit={handleSubmit}>
-          {/* NAME */}
-
           <div className="form-group">
             <label htmlFor="name">Full Name</label>
-
             <input
               id="name"
               type="text"
@@ -216,15 +230,13 @@ function Payment() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your full name"
+              autoComplete="name"
               required
             />
           </div>
 
-          {/* MOBILE */}
-
           <div className="form-group">
             <label htmlFor="mobile">Mobile Number</label>
-
             <input
               id="mobile"
               type="tel"
@@ -232,15 +244,13 @@ function Payment() {
               value={formData.mobile}
               onChange={handleChange}
               placeholder="Enter your mobile number"
+              autoComplete="tel"
               required
             />
           </div>
 
-          {/* EMAIL */}
-
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
-
             <input
               id="email"
               type="email"
@@ -248,11 +258,10 @@ function Payment() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email address"
+              autoComplete="email"
               required
             />
           </div>
-
-          {/* SERVICE */}
 
           <div className="form-group">
             <label htmlFor="service">Select Service</label>
@@ -263,64 +272,77 @@ function Payment() {
               value={formData.service}
               onChange={handleChange}
               required
+              disabled={isMeditation || isWebsiteDevelopment}
             >
               <option value="">Select a service</option>
-
-              <option value="Xerox & Printing">
-                Xerox & Printing
-              </option>
-
+              <option value="Xerox & Printing">Xerox & Printing</option>
               <option value="Website Development">
                 Website Development
               </option>
-
-              <option value="Digital Services">
-                Digital Services
-              </option>
-
+              <option value="Digital Services">Digital Services</option>
               <option value="Meditation Classes">
                 Meditation Classes
               </option>
-
-              <option value="Other Service">
-                Other Service
-              </option>
+              <option value="Other Service">Other Service</option>
             </select>
           </div>
 
-          {/* AMOUNT */}
+          {isWebsiteDevelopment ? (
+            <div className="page-card">
+              <h3>Project quotation</h3>
+              <p>
+                The project price will be confirmed after discussing
+                your requirements. No payment is requested at this stage.
+              </p>
 
-          <div className="form-group">
-            <label htmlFor="amount">Payment Amount (₹)</label>
+              <button
+  type="button"
+  className="page-button"
+  onClick={() => window.location.href =
+  "/hasta-digital-hub/contact?service=website-development"}
+>
+  Contact Us for a Quote →
+</button>
+            </div>
+          ) : (
+            <div className="form-group">
+              <label htmlFor="amount">Payment Amount (₹)</label>
 
-            <input
-              id="amount"
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              placeholder="Enter amount"
-              min="1"
-              required
-            />
-          </div>
+              <input
+                id="amount"
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                placeholder="Enter amount"
+                min="1"
+                step="1"
+                required
+                readOnly={isMeditation}
+              />
 
-          {/* PAYMENT BUTTON */}
+              {isMeditation && (
+                <small>
+                  Fixed fee: ₹299 per meditation session.
+                </small>
+              )}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            className="primary-btn payment-btn"
-            disabled={loading}
-            style={{
-              width: "100%",
-              marginTop: "10px",
-            }}
-          >
-            {loading ? "⏳ Processing..." : "💳 Pay Now"}
-          </button>
+          {!isWebsiteDevelopment && (
+            <button
+              type="submit"
+              className="primary-btn payment-btn"
+              disabled={loading}
+              style={{
+                width: "100%",
+                marginTop: "10px",
+              }}
+            >
+              {loading ? "⏳ Processing..." : "💳 Pay Now"}
+            </button>
+          )}
         </form>
-
-        {/* SECURITY NOTE */}
 
         <div
           style={{
@@ -329,7 +351,6 @@ function Payment() {
           }}
         >
           <p>🔒 Secure Online Payment</p>
-
           <small>
             Payments are securely processed through Razorpay.
           </small>

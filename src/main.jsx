@@ -6,8 +6,14 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 
+const isGitHubPages =
+  window.location.hostname === "cva90.github.io";
+
+const isLocalProjectPath =
+  window.location.pathname.startsWith("/hasta-digital-hub");
+
 const basename =
-  window.location.hostname === "cva90.github.io"
+  isGitHubPages || isLocalProjectPath
     ? "/hasta-digital-hub"
     : "/";
 
